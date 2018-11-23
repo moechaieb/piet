@@ -46,3 +46,7 @@ p {
   padding-left: 10px;
   text-align: justify;
 }
+
+circle:hover, rect:hover {
+  cursor: pointer;
+}
