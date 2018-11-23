@@ -1,0 +1,175 @@
+<html>
+  <head>
+    <title>Piet</title>
+    <script src="raphael.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+  </head>
+  <body>
+  <header>Piet</header>
+  <div id="canvas">
+    <script>
+      var paper = Raphael("canvas", 600, 600);
+      var palette = {blue: '#0000ff', yellow:'#ffff00', red:'#ff0000', white:'#ffffff', black: '#000000'};
+      var selectors;
+      var currentColor = palette.white;
+      var granularity = 50;
+
+      var hoverIn = Raphael.animation({"stroke-opacity" : 0.5}, 100)
+      var hoverOut = Raphael.animation({"stroke-opacity" : 0}, 100)
+
+      //add the selectors to the canvas
+      //blue
+      paper.circle(100,40, 25)
+      .attr("stroke-width", 5)
+      .attr("stroke", palette.blue)
+      .attr("fill", palette.blue)
+      .attr("stroke-opacity", 0)
+      .click(function() {
+        currentColor = palette.blue;
+      })
+      .hover(function() {
+        this.animate(hoverIn);
+      }, function () {
+        this.animate(hoverOut);
+      });
+      //red
+      paper.circle(100+133,40, 25)
+      .attr("stroke-width", 5)
+      .attr("stroke", palette.red)
+      .attr("fill", palette.red)
+      .attr("stroke-opacity", 0)
+      .click(function() {
+        currentColor = palette.red;
+      })
+      .hover(function() {
+        this.animate(hoverIn);
+      }, function () {
+        this.animate(hoverOut);
+      });
+      //yellow
+      paper.circle(100+133*2,40, 25)
+      .attr("stroke-width", 5)
+      .attr("stroke", palette.yellow)
+      .attr("fill", palette.yellow)
+      .attr("stroke-opacity", 0)
+      .click(function() {
+        currentColor = palette.yellow;
+      })
+      .hover(function() {
+        this.animate(hoverIn);
+      }, function () {
+        this.animate(hoverOut);
+      });
+      //white
+      paper.circle(100+3*133,40, 25)
+      .attr("stroke-width", 5)
+      .attr("stroke", palette.white)
+      .attr("fill", palette.white)
+      .attr("stroke-opacity", 0)
+      .click(function() {
+        currentColor = palette.white;
+      })
+      .hover(function() {
+        this.animate(hoverIn);
+      }, function () {
+        this.animate(hoverOut);
+      });
+
+      /*
+        Partitions the rectangle into sub-rectangles.
+      */
+      function partition(x,y,w,h,v) {
+        if(w >= granularity && h >= granularity) {
+          var random = Math.floor(Math.random()*2);
+          if(v) {
+            random = Math.floor(Math.random()*(w/100))*granularity+granularity;
+            draw(x,y,random,h,v);
+            if(Math.floor(Math.random()*2) == 0)
+              partition(x+random,y, w-random, h, false);
+            else partition(x+random,y, w-random, h, true);
+          } else {
+            random = Math.floor(Math.random()*(h/100))*granularity+granularity;
+            draw(x,y,w,random, v);
+            if(Math.floor(Math.random()*2) == 0)
+              partition(x,y+random,w,h-random, true);
+            else partition(x,y+random,w,h-random, false);
+          }
+        }
+      }
+
+      /*
+        Draws a vertical or horizontal bar of rectangles
+      */
+      function draw(x,y,w,h,v) {
+        var lengths;
+        var d;
+        if(v) {
+          lengths = lengthPartition(h);
+          d = y;
+          for (var i = 0; i < lengths.length; i++) {
+            paper.rect(x, d, w, lengths[i])
+            .attr("fill", palette.white)
+            .attr("stroke-width", 3)
+            .attr("stroke", palette.black)
+            .click(function() {
+              this.animate(Raphael.animation({"fill" : currentColor}, 500));
+            });
+            d += lengths[i];
+          };
+          //draw a bunch of rectangles, stacked vertically
+
+        } else {
+          lengths = lengthPartition(w);
+          d = x;
+          for (var i = 0; i < lengths.length; i++) {
+            paper.rect(d, y, lengths[i], h)
+            .attr("fill", palette.white)
+            .attr("stroke-width", 3)
+            .attr("stroke", palette.black)
+            .click(function() {
+              this.animate(Raphael.animation({"fill" : currentColor}, 500));
+            });
+            d += lengths[i];
+          };
+          //draw a bunch of rectangles, stacked horizontally
+        }
+      };
+
+      /*
+        Returns a random partition of the given length
+      */
+      function lengthPartition(l) {
+        var n = Math.floor(Math.random()*(l/granularity))+1;
+        var lengths = [];
+        var d = 0;
+        var length;
+        for (var i = 1; i <= n; i++) {
+          if(i == n || (l-d) <= granularity) {
+            lengths.push(l-d);
+            break;
+          }
+          length = Math.floor(Math.random()*((l-d)/granularity))*granularity+granularity;
+          d += length;
+          lengths.push(length);
+        };
+        return lengths;
+      };
+
+      partition(50,100,500,500, false);
+    </script>
+  </div>
+  <h1>A homage to Piet Mondrian</h1>
+  <p>
+    Dutch painter, theorist and draughtsman. His work marks the transition at the start of the 20th century from the Hague school and Symbolism to Neo-Impressionism and Cubism. His key position within the international avant-garde is determined by works produced after 1920. He set out his theory in the periodical of De Stijl, in a series of articles that were summarized in a separate booklet published in Paris in 1920 under the title Le Neo-plasticisme (see Neo-plasticism) by Leonce Rosenberg. The essence of Mondrian's ideas is that painting, composed of the most fundamental aspects of line and colour, must set an example to the other arts for achieving a society in which art as such has no place but belongs instead to the total realization of 'beauty'. The representation of the universal, dynamic pulse of life, also expressed in modern jazz and the metropolis, was Mondrian's point of departure. Even in his lifetime he was regarded as the founder of the most modern art. His artistic integrity caused him to be honoured as a classical master by artists who were aligned with entirely different styles, as well as by musicians and architects. He was able to make a living from the sale of his works in the Netherlands, Germany, Switzerland, England and the USA.
+  </p>
+  <a href="http://www.moma.org/collection/artist.php?artist_id=4057">Source</a></p>
+  <footer>
+    Made with <a href="http://raphaeljs.com/">Raphael</a>, by <a href="moechaieb.github.io">Mohamed Adam Chaieb</a>
+    <a class="github-button" href="https://github.com/moechaieb/piet" data-show-count="true" aria-label="Star moechaieb/piet on GitHub">Star</a>
+  </footer>
+
+  </body>
+</html>
